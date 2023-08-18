@@ -19,7 +19,7 @@ public interface IBookRepository extends ReactiveCrudRepository<BookDetailEntity
                       String title, String description,
                       String wks, String ipReq, String categoryId);
 
-    @Query("SELECT * FROM fn_find_book();")
+    @Query("SELECT * FROM sp_find_person();")
     Flux<FindBookDto> find();
 
 }
