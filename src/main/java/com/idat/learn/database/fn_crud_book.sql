@@ -1,4 +1,7 @@
-create function sp_crud_book(inoption character, inbookid character varying, intitle character varying, indescription character varying, inworkspace character varying, inipreq character varying, incategoryid character varying) returns character varying
+create or replace function sp_crud_book(inoption character, inbookid character varying, intitle character varying,
+                                        indescription character varying, inworkspace character varying,
+                                        inipreq character varying,
+                                        incategoryid character varying) returns character varying
     language plpgsql
 as
 $$
@@ -6,17 +9,17 @@ DECLARE
 LMessage VARCHAR(300) default '';
     LBookId  VARCHAR(36) default '';
 BEGIN
-BEGIN
-        InTitle := TRIM(InTitle);
-        InDescription := TRIM(InDescription);
 
-        IF (SELECT COUNT(*) FROM category where category_id = InCategoryId) = 0 THEN
-            LMessage := 'Esta categoria no existe o ha sido eliminado, por favor ingresar una valida';
-RAISE EXCEPTION '';
+    InTitle := TRIM(InTitle);
+    InDescription := TRIM(InDescription);
+
+    IF InOption <> 'D' AND (SELECT COUNT(*) FROM category where category_id = InCategoryId) = 0 THEN
+        LMessage := 'Esta categoria no existe o ha sido eliminado, por favor ingresar una valida';
+        RAISE EXCEPTION '';
 END IF;
 
-        IF InOption = 'N' THEN
-            LBookId := uuid_generate_v4();
+    IF InOption = 'N' THEN
+        LBookId := uuid_generate_v4();
 INSERT INTO book(book_id, title, description, __workspace_create__, __workspace_update__, __create_date__,
                  __update_date__, __ip_req__, __deleted__)
 VALUES (LBookId, InTitle, InDescription, InWorkspace, InWorkspace, now(), now(), InIpReq, false);
@@ -51,14 +54,11 @@ WHERE book_id = InBookId;
 
 END IF;
 
-COMMIT;
-END;
+RETURN LMessage;
 
 EXCEPTION
-    WHEN OTHERS THEN ROLLBACK ;
+    WHEN OTHERS THEN
+        return LMessage;
 
 END;
 $$;
-
-alter function sp_crud_book(char, varchar, varchar, varchar, varchar, varchar, varchar) owner to postgres;
-

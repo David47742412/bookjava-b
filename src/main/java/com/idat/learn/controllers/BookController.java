@@ -38,10 +38,11 @@ public class BookController {
         });
     }
 
-    @PutMapping()
-    public Mono<ResponseEntity<ResponseApi<FindBookDto>>> update(@RequestBody() CrudBookDto crudBookDto, HttpServletRequest req) {
+    @PutMapping("{id}")
+    public Mono<ResponseEntity<ResponseApi<FindBookDto>>> update(@PathVariable String id, @RequestBody() CrudBookDto crudBookDto, HttpServletRequest req) {
         crudBookDto.workspace = req.getHeader("User-Agent");
         crudBookDto.ipReq = req.getRemoteAddr();
+        crudBookDto.bookId = id;
         return this._service.curd('M', crudBookDto).publishOn(Schedulers.boundedElastic()).map(dataResult -> {
             dataResult.body = Objects.requireNonNull(this._service.find().block()).body;
             return new ResponseEntity<>(dataResult, HttpStatusCode.valueOf(dataResult.statusCode));
@@ -54,7 +55,7 @@ public class BookController {
         crudBookDto.workspace = req.getHeader("User-Agent");
         crudBookDto.ipReq = req.getRemoteAddr();
         crudBookDto.bookId = id;
-        return this._service.curd('E', crudBookDto).publishOn(Schedulers.boundedElastic()).map(dataResult -> {
+        return this._service.curd('D', crudBookDto).publishOn(Schedulers.boundedElastic()).map(dataResult -> {
             dataResult.body = Objects.requireNonNull(this._service.find().block()).body;
             return new ResponseEntity<>(dataResult, HttpStatusCode.valueOf(dataResult.statusCode));
         });

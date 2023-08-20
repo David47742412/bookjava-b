@@ -51,6 +51,7 @@ public class BookService {
                 .onErrorResume(ex -> {
                     response.statusCode = 500;
                     response.message = "Ha ocurrido un error inesperado al momento de guardar los datos";
+                    System.out.println(ex.getMessage());
                     return Mono.just(response);
                 });
     }

@@ -9,6 +9,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.annotation.NonNull;
 import reactor.util.annotation.NonNullApi;
 
+//@RepositoryRestResource(exported = false, path = "category", collectionResourceRel = "category") solo se puede utilizar para JPA y CRUDJPA
 @Repository
 public interface ICategoryRepository extends ReactiveCrudRepository<CategoryEntity, String> {
     @Query(value = "SELECT category_id, description FROM category WHERE __deleted__ = false")
